@@ -1,0 +1,9 @@
+{
+  "version": 2,
+  "rewrites": [
+    { "source": "/report", "destination": "/api/index.js" },
+    { "source": "/reports", "destination": "/api/index.js" },
+    { "source": "/encouragement", "destination": "/api/index.js" },
+    { "source": "/(.*)", "destination": "/frontend/$1" }
+  ]
+}

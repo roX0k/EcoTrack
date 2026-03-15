@@ -690,7 +690,7 @@
                                 }
 
                                 try {
-                                    const response = await fetch('http://localhost:3000/report', {
+                                    const response = await fetch('/report', {
                                         method: 'POST',
                                         headers: {
                                             'Content-Type': 'application/json'
@@ -793,7 +793,7 @@ async function initCamera() {
                 // Activity Feed Logic
                 async function fetchReports() {
                     try {
-                        const response = await fetch('http://localhost:3000/reports');
+                        const response = await fetch('/reports');
                         if (!response.ok) throw new Error('Could not fetch reports');
                         const reports = await response.json();
                         renderFeed(reports);
