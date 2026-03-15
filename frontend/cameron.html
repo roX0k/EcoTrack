@@ -573,7 +573,8 @@
             let useManualLocation = false;
             let manualParish = '';
             let manualCommunity = '';
-            let locationResolved = false; // New flag to track if location is resolved
+            let locationResolved = false;
+            let cooldownActive = false;
 
             // Initialize IndexedDB
             function initDB() {
@@ -914,8 +915,11 @@
                                     captureBtn.style.transform = '';
                                 }, 100);
 
-                                showSuccess(`✅ Report sent successfully! (ID: ${result._id})`);
+                                showSuccess(`✅ Report sent! Next report available in 60s.`);
                                 descriptionInput.value = ''; // Clear description
+
+                                // Anti-spam cooldown
+                                startCooldown(60);
 
                                 // Refresh activity feed
                                 fetchReports();
@@ -935,6 +939,23 @@
                     }
 
                 }, 'image/png');
+            }
+
+            function startCooldown(seconds) {
+                cooldownActive = true;
+                captureBtn.disabled = true;
+                let remaining = seconds;
+                const originalText = captureBtn.textContent;
+                const interval = setInterval(() => {
+                    captureBtn.textContent = `⏳ Wait ${remaining}s`;
+                    remaining--;
+                    if (remaining < 0) {
+                        clearInterval(interval);
+                        cooldownActive = false;
+                        captureBtn.disabled = false;
+                        captureBtn.textContent = originalText;
+                    }
+                }, 1000);
             }
 
             async function initCamera() {
