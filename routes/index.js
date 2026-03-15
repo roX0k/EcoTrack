@@ -2,6 +2,7 @@ const express = require('express');
 const { z } = require('zod');
 const nodemailer = require('nodemailer');
 const Report = require('../models/Report');
+const connectDB = require('../config/db');
 
 const router = express.Router();
 
@@ -20,18 +21,24 @@ const encouragementMessages = [
   "Together, we can heal the planet.",
 ];
 
-// Email Transporter setup
-const transporter = nodemailer.createTransport({
-  host: process.env.SMTP_HOST,
-  port: process.env.SMTP_PORT,
-  secure: false, // true for 465, false for other ports
-  auth: {
-    user: process.env.SMTP_USER,
-    pass: process.env.SMTP_PASS,
-  },
-});
-
 const sendEmailNotification = async (report) => {
+  // Create transporter inside the function so it only runs when needed
+  // and doesn't crash on cold start if env vars are missing
+  if (!process.env.SMTP_USER || !process.env.SMTP_PASS) {
+    console.log('Email env vars not set, skipping notification.');
+    return;
+  }
+
+  const transporter = nodemailer.createTransport({
+    host: process.env.SMTP_HOST || 'smtp.gmail.com',
+    port: parseInt(process.env.SMTP_PORT) || 587,
+    secure: false,
+    auth: {
+      user: process.env.SMTP_USER,
+      pass: process.env.SMTP_PASS,
+    },
+  });
+
   const mailOptions = {
     from: `"EcoTrack System" <${process.env.SMTP_USER}>`,
     to: process.env.OFFICIAL_EMAIL,
@@ -52,22 +59,17 @@ const sendEmailNotification = async (report) => {
     console.log('Notification email sent successfully');
   } catch (error) {
     console.error('Error sending notification email:', error);
-    // We don't want to fail the request if email fails, but we should log it
   }
 };
 
 // POST /report - Create a new pollution report
 router.post('/report', async (req, res) => {
   try {
-    // Validate request body
+    await connectDB();
     const validatedData = reportSchema.parse(req.body);
-
     const newReport = new Report(validatedData);
     const savedReport = await newReport.save();
-
-    // Trigger email notification asynchronously
-    sendEmailNotification(savedReport);
-
+    sendEmailNotification(savedReport); // fire and forget
     res.status(201).json(savedReport);
   } catch (error) {
     if (error instanceof z.ZodError) {
@@ -81,6 +83,7 @@ router.post('/report', async (req, res) => {
 // GET /reports - Fetch all reports
 router.get('/reports', async (req, res) => {
   try {
+    await connectDB();
     const reports = await Report.find().sort({ timestamp: -1 });
     res.json(reports);
   } catch (error) {
