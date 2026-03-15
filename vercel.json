@@ -5,6 +5,6 @@
     { "source": "/reports", "destination": "/api/index.js" },
     { "source": "/encouragement", "destination": "/api/index.js" },
     { "source": "/", "destination": "/frontend/cameron.html" },
-    { "source": "/(.*)", "destination": "/frontend/$1" }
+    { "source": "/(.+)", "destination": "/frontend/$1" }
   ]
 }
