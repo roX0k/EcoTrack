@@ -915,11 +915,11 @@
                                     captureBtn.style.transform = '';
                                 }, 100);
 
-                                showSuccess(`✅ Report sent! Next report available in 60s.`);
-                                descriptionInput.value = ''; // Clear description
+                                showSuccess(`✅ Report sent! Next report in 5s.`);
+                                descriptionInput.value = '';
 
                                 // Anti-spam cooldown
-                                startCooldown(60);
+                                startCooldown(5);
 
                                 // Refresh activity feed
                                 fetchReports();
@@ -1070,10 +1070,11 @@
                                     Location Verified
                                 </div>
                                 <div class="report-time">${dateStr} at ${timeStr}</div>
-                                <a href="https://www.google.com/maps?q=${report.latitude},${report.longitude}" target="_blank" class="report-link">
-                                    View Map 
+                                ${(report.latitude !== 0 || report.longitude !== 0) ? `
+                                <a href="https://www.google.com/maps?q=${report.latitude},${report.longitude}&ll=${report.latitude},${report.longitude}&z=17" target="_blank" class="report-link">
+                                    📍 View on Map 
                                     <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6m4-3h6v6m-11 5L21 3"></path></svg>
-                                </a>
+                                </a>` : '<div class="report-time" style="opacity:0.5">📍 Location not available</div>'}
                             </div>
                         `;
                     activityFeed.appendChild(card);
