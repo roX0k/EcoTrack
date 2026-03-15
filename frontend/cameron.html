@@ -1,987 +1,1047 @@
 <!DOCTYPE html>
 <html lang="en">
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>EcoTrack</title>
-        <link rel="preconnect" href="https://fonts.googleapis.com">
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-        <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
-        <style>
-            :root {
-                --primary: #10b981;
-                --primary-dark: #059669;
-                --bg-deep: #022c22;
-                --bg-gradient: linear-gradient(135deg, #022c22 0%, #064e3b 100%);
-                --glass: rgba(255, 255, 255, 0.03);
-                --glass-border: rgba(255, 255, 255, 0.08);
-                --glass-glow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
-                --text-main: #ffffff;
-                --text-muted: #ffffff;
-                --accent: #fbbf24;
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EcoTrack</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #10b981;
+            --primary-dark: #059669;
+            --bg-deep: #022c22;
+            --bg-gradient: linear-gradient(135deg, #022c22 0%, #064e3b 100%);
+            --glass: rgba(255, 255, 255, 0.03);
+            --glass-border: rgba(255, 255, 255, 0.08);
+            --glass-glow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+            --text-main: #ffffff;
+            --text-muted: #ffffff;
+            --accent: #fbbf24;
+        }
+
+        ::placeholder {
+            color: #ffffff;
+            opacity: 0.7;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Outfit', sans-serif;
+        }
+
+        body {
+            background: var(--bg-deep);
+            background-attachment: fixed;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 2rem 1rem;
+            color: var(--text-main);
+            overflow-x: hidden;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle at 50% 50%, rgba(16, 185, 129, 0.03) 0%, transparent 70%);
+            pointer-events: none;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 580px;
+            z-index: 1;
+        }
+
+        .card {
+            background: var(--glass);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid var(--glass-border);
+            border-radius: 2rem;
+            padding: 1.75rem 2rem;
+            box-shadow: var(--glass-glow);
+            margin-bottom: 2rem;
+            position: relative;
+            overflow: hidden;
+            animation: slideUp 0.6s cubic-bezier(0.23, 1, 0.32, 1);
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
             }
 
-            ::placeholder {
-                color: #ffffff;
-                opacity: 0.7;
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        h1 {
+            font-weight: 800;
+            font-size: 2.5rem;
+            background: linear-gradient(to right, #10b981, #34d399);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 0.5rem;
+            letter-spacing: -0.02em;
+            text-align: center;
+        }
+
+        .subtitle {
+            color: var(--text-muted);
+            text-align: center;
+            margin-bottom: 1.25rem;
+            font-weight: 300;
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+
+        .live-view {
+            background: #000;
+            border-radius: 1.5rem;
+            overflow: hidden;
+            border: 1px solid var(--glass-border);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            margin: 1.5rem 0;
+            aspect-ratio: 4/3;
+            position: relative;
+        }
+
+        video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transform: scaleX(-1);
+        }
+
+        #canvas {
+            display: none;
+        }
+
+        .instruction {
+            font-size: 0.95rem;
+            color: var(--text-muted);
+            text-align: center;
+            margin-bottom: 1.5rem;
+            line-height: 1.6;
+        }
+
+        textarea {
+            width: 100%;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--glass-border);
+            border-radius: 1.25rem;
+            padding: 1.1rem;
+            color: #ffffff;
+            font-size: 1rem;
+            resize: none;
+            transition: all 0.3s ease;
+            margin-bottom: 0.5rem;
+            min-height: 85px;
+        }
+
+        textarea:focus {
+            outline: none;
+            border-color: var(--primary);
+            background: rgba(255, 255, 255, 0.05);
+            box-shadow: 0 0 0 4px rgba(16, 185, 129, 0.1);
+        }
+
+        .camera-button {
+            background: var(--primary);
+            border: none;
+            width: 85px;
+            height: 85px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 0.5rem auto;
+            font-size: 2.15rem;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            box-shadow: 0 10px 25px rgba(16, 185, 129, 0.3);
+            position: relative;
+            z-index: 2;
+        }
+
+        .camera-button:hover {
+            transform: scale(1.1) rotate(5deg);
+            background: var(--primary-dark);
+            box-shadow: 0 15px 35px rgba(16, 185, 129, 0.4);
+        }
+
+        .camera-button:active {
+            transform: scale(0.95);
+        }
+
+        .camera-button:disabled {
+            background: var(--text-muted);
+            opacity: 0.3;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .camera-button.flash {
+            animation: buttonFlash 0.4s ease-out;
+        }
+
+        @keyframes buttonFlash {
+            0% {
+                background: #fff;
+                transform: scale(1.2);
             }
 
-            * {
-                box-sizing: border-box;
-                margin: 0;
-                padding: 0;
-                font-family: 'Outfit', sans-serif;
-            }
-
-            body {
-                background: var(--bg-deep);
-                background-attachment: fixed;
-                min-height: 100vh;
-                display: flex;
-                flex-direction: column;
-                align-items: center;
-                padding: 2rem 1rem;
-                color: var(--text-main);
-                overflow-x: hidden;
-            }
-
-            body::before {
-                content: '';
-                position: fixed;
-                top: 0;
-                left: 0;
-                width: 100%;
-                height: 100%;
-                background: radial-gradient(circle at 50% 50%, rgba(16, 185, 129, 0.03) 0%, transparent 70%);
-                pointer-events: none;
-            }
-
-            .container {
-                width: 100%;
-                max-width: 580px;
-                z-index: 1;
-            }
-
-            .card {
-                background: var(--glass);
-                backdrop-filter: blur(12px);
-                -webkit-backdrop-filter: blur(12px);
-                border: 1px solid var(--glass-border);
-                border-radius: 2rem;
-                padding: 1.75rem 2rem;
-                box-shadow: var(--glass-glow);
-                margin-bottom: 2rem;
-                position: relative;
-                overflow: hidden;
-                animation: slideUp 0.6s cubic-bezier(0.23, 1, 0.32, 1);
-            }
-
-            @keyframes slideUp {
-                from { opacity: 0; transform: translateY(20px); }
-                to { opacity: 1; transform: translateY(0); }
-            }
-
-            h1 {
-                font-weight: 800;
-                font-size: 2.5rem;
-                background: linear-gradient(to right, #10b981, #34d399);
-                -webkit-background-clip: text;
-                background-clip: text;
-                -webkit-text-fill-color: transparent;
-                margin-bottom: 0.5rem;
-                letter-spacing: -0.02em;
-                text-align: center;
-            }
-
-            .subtitle {
-                color: var(--text-muted);
-                text-align: center;
-                margin-bottom: 1.25rem;
-                font-weight: 300;
-                font-size: 1.1rem;
-                opacity: 0.9;
-            }
-
-            .live-view {
-                background: #000;
-                border-radius: 1.5rem;
-                overflow: hidden;
-                border: 1px solid var(--glass-border);
-                box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-                margin: 1.5rem 0;
-                aspect-ratio: 4/3;
-                position: relative;
-            }
-
-            video {
-                width: 100%;
-                height: 100%;
-                object-fit: cover;
-                transform: scaleX(-1);
-            }
-
-            .instruction {
-                font-size: 0.95rem;
-                color: var(--text-muted);
-                text-align: center;
-                margin-bottom: 1.5rem;
-                line-height: 1.6;
-            }
-
-            textarea {
-                width: 100%;
-                background: rgba(255, 255, 255, 0.03);
-                border: 1px solid var(--glass-border);
-                border-radius: 1.25rem;
-                padding: 1.1rem;
-                color: #ffffff;
-                font-size: 1rem;
-                resize: none;
-                transition: all 0.3s ease;
-                margin-bottom: 0.5rem;
-                min-height: 85px;
-            }
-
-            textarea:focus {
-                outline: none;
-                border-color: var(--primary);
-                background: rgba(255, 255, 255, 0.05);
-                box-shadow: 0 0 0 4px rgba(16, 185, 129, 0.1);
-            }
-
-            .camera-button {
+            100% {
                 background: var(--primary);
-                border: none;
-                width: 85px;
-                height: 85px;
-                border-radius: 50%;
-                cursor: pointer;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                margin: 0 auto 0.5rem auto;
-                font-size: 2.15rem;
-                transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-                box-shadow: 0 10px 25px rgba(16, 185, 129, 0.3);
-                position: relative;
-                z-index: 2;
+                transform: scale(1);
+            }
+        }
+
+        .status-badge {
+            font-size: 0.85rem;
+            text-align: center;
+            margin: 0.25rem 0;
+            color: var(--text-muted);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--accent);
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% {
+                opacity: 1;
+                transform: scale(1);
             }
 
-            .camera-button:hover {
-                transform: scale(1.1) rotate(5deg);
-                background: var(--primary-dark);
-                box-shadow: 0 15px 35px rgba(16, 185, 129, 0.4);
+            50% {
+                opacity: 0.4;
+                transform: scale(1.2);
             }
 
-            .camera-button:active {
-                transform: scale(0.95);
+            100% {
+                opacity: 1;
+                transform: scale(1);
             }
+        }
 
-            .camera-button:disabled {
-                background: var(--text-muted);
-                opacity: 0.3;
-                cursor: not-allowed;
-                transform: none;
-            }
+        .manual-location-box {
+            background: rgba(255, 255, 255, 0.02);
+            border-radius: 1.5rem;
+            padding: 1.15rem;
+            border: 1px solid var(--glass-border);
+            margin-top: 0.5rem;
+        }
 
-            .camera-button.flash {
-                animation: buttonFlash 0.4s ease-out;
-            }
+        .manual-location-box h3 {
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: #ffffff;
+            margin-bottom: 0.75rem;
+        }
 
-            @keyframes buttonFlash {
-                0% { background: #fff; transform: scale(1.2); }
-                100% { background: var(--primary); transform: scale(1); }
-            }
+        select,
+        input[type="text"] {
+            width: 100%;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--glass-border);
+            border-radius: 1rem;
+            padding: 0.85rem 1rem;
+            color: var(--text-main);
+            margin-bottom: 0.75rem;
+            font-size: 0.95rem;
+        }
 
-            .status-badge {
-                font-size: 0.85rem;
-                text-align: center;
-                margin: 0.25rem 0;
-                color: var(--text-muted);
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                gap: 0.5rem;
-            }
+        select option {
+            background: var(--bg-deep);
+            color: white;
+        }
 
-            .status-dot {
-                width: 8px;
-                height: 8px;
-                border-radius: 50%;
-                background: var(--accent);
-                animation: pulse 2s infinite;
-            }
+        .manual-submit {
+            background: transparent;
+            border: 1px solid var(--primary);
+            color: var(--primary);
+            width: 100%;
+            padding: 0.85rem;
+            border-radius: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
 
-            @keyframes pulse {
-                0% { opacity: 1; transform: scale(1); }
-                50% { opacity: 0.4; transform: scale(1.2); }
-                100% { opacity: 1; transform: scale(1); }
-            }
+        .manual-submit:hover {
+            background: var(--primary);
+            color: white;
+        }
 
-            .manual-location-box {
-                background: rgba(255, 255, 255, 0.02);
-                border-radius: 1.5rem;
-                padding: 1.15rem;
-                border: 1px solid var(--glass-border);
-                margin-top: 0.5rem;
-            }
+        #errorMsg,
+        #successMsg {
+            margin-top: 1.5rem;
+            padding: 1rem 1.5rem;
+            border-radius: 1.25rem;
+            font-size: 0.9rem;
+            text-align: center;
+            display: none;
+            animation: fadeIn 0.3s ease;
+        }
 
-            .manual-location-box h3 {
-                font-size: 0.9rem;
-                text-transform: uppercase;
-                letter-spacing: 0.05em;
-                color: #ffffff;
-                margin-bottom: 0.75rem;
-            }
+        #errorMsg {
+            background: rgba(239, 68, 68, 0.1);
+            color: #f87171;
+            border: 1px solid rgba(239, 68, 68, 0.2);
+        }
 
-            select, input[type="text"] {
-                width: 100%;
-                background: rgba(255, 255, 255, 0.05);
-                border: 1px solid var(--glass-border);
-                border-radius: 1rem;
-                padding: 0.85rem 1rem;
-                color: var(--text-main);
-                margin-bottom: 0.75rem;
-                font-size: 0.95rem;
-            }
+        #successMsg {
+            background: rgba(16, 185, 129, 0.1);
+            color: #34d399;
+            border: 1px solid rgba(16, 185, 129, 0.2);
+        }
 
-            select option {
-                background: var(--bg-deep);
-                color: white;
-            }
-
-            .manual-submit {
-                background: transparent;
-                border: 1px solid var(--primary);
-                color: var(--primary);
-                width: 100%;
-                padding: 0.85rem;
-                border-radius: 1rem;
-                font-weight: 600;
-                cursor: pointer;
-                transition: all 0.3s ease;
-            }
-
-            .manual-submit:hover {
-                background: var(--primary);
-                color: white;
-            }
-
-            #errorMsg, #successMsg {
-                margin-top: 1.5rem;
-                padding: 1rem 1.5rem;
-                border-radius: 1.25rem;
-                font-size: 0.9rem;
-                text-align: center;
-                display: none;
-                animation: fadeIn 0.3s ease;
-            }
-
-            #errorMsg {
-                background: rgba(239, 68, 68, 0.1);
-                color: #f87171;
-                border: 1px solid rgba(239, 68, 68, 0.2);
-            }
-
-            #successMsg {
-                background: rgba(16, 185, 129, 0.1);
-                color: #34d399;
-                border: 1px solid rgba(16, 185, 129, 0.2);
-            }
-
-            @keyframes fadeIn {
-                from { opacity: 0; }
-                to { opacity: 1; }
-            }
-
-            .feed-container {
-                margin-top: 2rem;
-            }
-
-            .feed-title {
-                font-weight: 600;
-                font-size: 1.25rem;
-                margin-bottom: 1.5rem;
-                display: flex;
-                align-items: center;
-                gap: 0.75rem;
-            }
-
-            .feed-title::after {
-                content: '';
-                flex: 1;
-                height: 1px;
-                background: var(--glass-border);
-            }
-
-            .report-card {
-                background: var(--glass);
-                backdrop-filter: blur(8px);
-                border: 1px solid var(--glass-border);
-                border-radius: 1.5rem;
-                margin-bottom: 1.25rem;
-                overflow: hidden;
-                display: flex;
-                gap: 1.25rem;
-                padding: 1.25rem;
-                transition: transform 0.3s ease, background 0.3s ease;
-            }
-
-            .report-card:hover {
-                transform: translateY(-4px);
-                background: rgba(255, 255, 255, 0.05);
-            }
-
-            .report-image-container {
-                width: 140px;
-                height: 140px;
-                flex-shrink: 0;
-                border-radius: 1rem;
-                overflow: hidden;
-                border: 1px solid var(--glass-border);
-            }
-
-            .report-image-container img {
-                width: 100%;
-                height: 100%;
-                object-fit: cover;
-            }
-
-            .report-info {
-                flex: 1;
-                display: flex;
-                flex-direction: column;
-                justify-content: center;
-            }
-
-            .report-desc {
-                font-weight: 600;
-                font-size: 1.05rem;
-                margin-bottom: 0.5rem;
-                line-height: 1.4;
-                color: var(--text-main);
-            }
-
-            .report-location {
-                font-size: 0.85rem;
-                color: var(--text-muted);
-                display: flex;
-                align-items: center;
-                gap: 0.4rem;
-                margin-bottom: 0.5rem;
-            }
-
-            .report-time {
-                font-size: 0.8rem;
-                color: var(--primary);
-                font-weight: 600;
-            }
-
-            .report-link {
-                margin-top: 0.75rem;
-                font-size: 0.85rem;
-                color: var(--accent);
-                text-decoration: none;
-                display: inline-flex;
-                align-items: center;
-                gap: 0.25rem;
-            }
-
-            .report-link:hover {
-                text-decoration: underline;
-            }
-
-            .loading-feed {
-                text-align: center;
-                color: var(--text-muted);
-                padding: 3rem;
-                font-weight: 300;
-            }
-
-            .screen-flash {
-                position: fixed;
-                inset: 0;
-                background: white;
-                z-index: 100;
-                pointer-events: none;
+        @keyframes fadeIn {
+            from {
                 opacity: 0;
             }
 
-            .screen-flash.active {
-                animation: flashEffect 0.4s ease-out;
+            to {
+                opacity: 1;
+            }
+        }
+
+        .feed-container {
+            margin-top: 2rem;
+        }
+
+        .feed-title {
+            font-weight: 600;
+            font-size: 1.25rem;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .feed-title::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: var(--glass-border);
+        }
+
+        .report-card {
+            background: var(--glass);
+            backdrop-filter: blur(8px);
+            border: 1px solid var(--glass-border);
+            border-radius: 1.5rem;
+            margin-bottom: 1.25rem;
+            overflow: hidden;
+            display: flex;
+            gap: 1.25rem;
+            padding: 1.25rem;
+            transition: transform 0.3s ease, background 0.3s ease;
+        }
+
+        .report-card:hover {
+            transform: translateY(-4px);
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .report-image-container {
+            width: 140px;
+            height: 140px;
+            flex-shrink: 0;
+            border-radius: 1rem;
+            overflow: hidden;
+            border: 1px solid var(--glass-border);
+        }
+
+        .report-image-container img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .report-info {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .report-desc {
+            font-weight: 600;
+            font-size: 1.05rem;
+            margin-bottom: 0.5rem;
+            line-height: 1.4;
+            color: var(--text-main);
+        }
+
+        .report-location {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .report-time {
+            font-size: 0.8rem;
+            color: var(--primary);
+            font-weight: 600;
+        }
+
+        .report-link {
+            margin-top: 0.75rem;
+            font-size: 0.85rem;
+            color: var(--accent);
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.25rem;
+        }
+
+        .report-link:hover {
+            text-decoration: underline;
+        }
+
+        .loading-feed {
+            text-align: center;
+            color: var(--text-muted);
+            padding: 3rem;
+            font-weight: 300;
+        }
+
+        .screen-flash {
+            position: fixed;
+            inset: 0;
+            background: white;
+            z-index: 100;
+            pointer-events: none;
+            opacity: 0;
+        }
+
+        .screen-flash.active {
+            animation: flashEffect 0.4s ease-out;
+        }
+
+        @keyframes flashEffect {
+            0% {
+                opacity: 0.6;
             }
 
-            @keyframes flashEffect {
-                0% { opacity: 0.6; }
-                100% { opacity: 0; }
+            100% {
+                opacity: 0;
+            }
+        }
+
+        /* Mobile Optimizations */
+        @media (max-width: 480px) {
+            .container {
+                padding: 0 0.5rem;
             }
 
-            /* Mobile Optimizations */
-            @media (max-width: 480px) {
-                .container { padding: 0 0.5rem; }
-                .card { padding: 1.5rem; }
-                .report-card { flex-direction: column; }
-                .report-image-container { width: 100%; height: 200px; }
+            .card {
+                padding: 1.5rem;
             }
-        </style>
-    </head>
-    <body>
-        <div class="screen-flash" id="screenFlash"></div>
-        <div class="container">
-            <div class="card">
-                <h1>EcoTrack</h1>
-                <p class="subtitle">Protecting Jamaica, one report at a time.</p>
-                
-                <div class="live-view">
-                    <video id="video" autoplay playsinline></video>
-                </div>
-                
-                <div class="instruction">
-                    Point your camera at the pollution source, describe the issue, and tap below.
-                </div>
 
-                <textarea id="descriptionInput" placeholder="Describe the pollution (e.g., plastic waste, illegal dumping)..."></textarea>
-                
-                <button class="camera-button" id="captureBtn" disabled>📸</button>
+            .report-card {
+                flex-direction: column;
+            }
 
-                <div id="locationStatus" class="status-badge">
-                    <div class="status-dot"></div>
-                    <span>Initializing location services...</span>
-                </div>
-                
-                <div id="manualLocationBox" class="manual-location-box">
-                    <h3>Refine Your Location</h3>
-                    <select id="parishSelect">
-                        <option value="">Select Parish</option>
-                        <option value="Kingston">Kingston</option>
-                        <option value="St. Andrew">St. Andrew</option>
-                        <option value="St. Thomas">St. Thomas</option>
-                        <option value="Portland">Portland</option>
-                        <option value="St. Mary">St. Mary</option>
-                        <option value="St. Ann">St. Ann</option>
-                        <option value="Trelawny">Trelawny</option>
-                        <option value="St. James">St. James</option>
-                        <option value="Hanover">Hanover</option>
-                        <option value="Westmoreland">Westmoreland</option>
-                        <option value="St. Elizabeth">St. Elizabeth</option>
-                        <option value="Manchester">Manchester</option>
-                        <option value="Clarendon">Clarendon</option>
-                        <option value="St. Catherine">St. Catherine</option>
-                    </select>
-                    <input type="text" id="communityInput" placeholder="Enter Community/District Name">
-                    <button class="manual-submit" id="submitManualLocation">Update Location</button>
-                </div>
-                
-                <canvas id="canvas"></canvas>
-                
-                <div id="errorMsg"></div>
-                <div id="successMsg"></div>
+            .report-image-container {
+                width: 100%;
+                height: 200px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="screen-flash" id="screenFlash"></div>
+    <div class="container">
+        <div class="card">
+            <h1>EcoTrack</h1>
+            <p class="subtitle">Protecting Jamaica, one report at a time.</p>
+
+            <div class="live-view">
+                <video id="video" autoplay playsinline></video>
             </div>
 
-            <div class="feed-container">
-                <h2 class="feed-title">
-                    <svg width="20" height="20" fill="var(--primary)" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 14H9V9h2v7zm4 0h-2V7h2v9z"></path></svg>
-                    Recent Activity
-                </h2>
-                <div id="activityFeed">
-                    <div class="loading-feed">Loading the latest reports...</div>
-                </div>
+            <div class="instruction">
+                Point your camera at the pollution source, describe the issue, and tap below.
             </div>
+
+            <textarea id="descriptionInput"
+                placeholder="Describe the pollution (e.g., plastic waste, illegal dumping)..."></textarea>
+
+            <button class="camera-button" id="captureBtn" disabled>📸</button>
+
+            <div id="locationStatus" class="status-badge">
+                <div class="status-dot"></div>
+                <span>Initializing location services...</span>
+            </div>
+
+            <div id="manualLocationBox" class="manual-location-box">
+                <h3>Refine Your Location</h3>
+                <select id="parishSelect">
+                    <option value="">Select Parish</option>
+                    <option value="Kingston">Kingston</option>
+                    <option value="St. Andrew">St. Andrew</option>
+                    <option value="St. Thomas">St. Thomas</option>
+                    <option value="Portland">Portland</option>
+                    <option value="St. Mary">St. Mary</option>
+                    <option value="St. Ann">St. Ann</option>
+                    <option value="Trelawny">Trelawny</option>
+                    <option value="St. James">St. James</option>
+                    <option value="Hanover">Hanover</option>
+                    <option value="Westmoreland">Westmoreland</option>
+                    <option value="St. Elizabeth">St. Elizabeth</option>
+                    <option value="Manchester">Manchester</option>
+                    <option value="Clarendon">Clarendon</option>
+                    <option value="St. Catherine">St. Catherine</option>
+                </select>
+                <input type="text" id="communityInput" placeholder="Enter Community/District Name">
+                <button class="manual-submit" id="submitManualLocation">Update Location</button>
+            </div>
+
+            <canvas id="canvas"></canvas>
+
+            <div id="errorMsg"></div>
+            <div id="successMsg"></div>
         </div>
 
-        <script>
-            (function() {
-                const video = document.getElementById('video');
-                const canvas = document.getElementById('canvas');
-                const captureBtn = document.getElementById('captureBtn');
-                const errorMsg = document.getElementById('errorMsg');
-                const successMsg = document.getElementById('successMsg');
-                const locationStatus = document.getElementById('locationStatus');
-                const manualLocationBox = document.getElementById('manualLocationBox');
-                const parishSelect = document.getElementById('parishSelect');
-                const communityInput = document.getElementById('communityInput');
-                const descriptionInput = document.getElementById('descriptionInput');
-                const submitManualLocation = document.getElementById('submitManualLocation');
-                const screenFlash = document.getElementById('screenFlash');
-                const activityFeed = document.getElementById('activityFeed');
-                const editLocationBtn = document.getElementById('editLocationBtn');
+        <div class="feed-container">
+            <h2 class="feed-title">
+                <svg width="20" height="20" fill="var(--primary)" viewBox="0 0 24 24">
+                    <path
+                        d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 14H9V9h2v7zm4 0h-2V7h2v9z">
+                    </path>
+                </svg>
+                Recent Activity
+            </h2>
+            <div id="activityFeed">
+                <div class="loading-feed">Loading the latest reports...</div>
+            </div>
+        </div>
+    </div>
 
-                let streaming = false;
-                let currentPosition = null;
-                let locationWatchId = null;
-                let db = null;
-                let useManualLocation = false;
-                let manualParish = '';
-                let manualCommunity = '';
-                let locationResolved = false; // New flag to track if location is resolved
+    <script>
+        (function () {
+            const video = document.getElementById('video');
+            const canvas = document.getElementById('canvas');
+            const captureBtn = document.getElementById('captureBtn');
+            const errorMsg = document.getElementById('errorMsg');
+            const successMsg = document.getElementById('successMsg');
+            const locationStatus = document.getElementById('locationStatus');
+            const manualLocationBox = document.getElementById('manualLocationBox');
+            const parishSelect = document.getElementById('parishSelect');
+            const communityInput = document.getElementById('communityInput');
+            const descriptionInput = document.getElementById('descriptionInput');
+            const submitManualLocation = document.getElementById('submitManualLocation');
+            const screenFlash = document.getElementById('screenFlash');
+            const activityFeed = document.getElementById('activityFeed');
+            const editLocationBtn = document.getElementById('editLocationBtn');
 
-                // Initialize IndexedDB
-                function initDB() {
-                    const request = indexedDB.open('EcoTrackerDB', 2);
-                    
-                    request.onerror = (event) => {
-                        console.error('Database error:', event.target.error);
-                        showError('Could not open database');
-                    };
-                    
-                    request.onupgradeneeded = (event) => {
-                        db = event.target.result;
-                        
-                        if (!db.objectStoreNames.contains('captures')) {
-                            const store = db.createObjectStore('captures', { keyPath: 'id', autoIncrement: true });
-                            store.createIndex('timestamp', 'timestamp', { unique: false });
-                            store.createIndex('location', 'location', { unique: false });
-                        }
-                    };
-                    
-                    request.onsuccess = (event) => {
-                        db = event.target.result;
-                        console.log('Database initialized');
-                    };
-                }
+            let streaming = false;
+            let currentPosition = null;
+            let locationWatchId = null;
+            let db = null;
+            let useManualLocation = false;
+            let manualParish = '';
+            let manualCommunity = '';
+            let locationResolved = false; // New flag to track if location is resolved
 
-                // Enable camera button if camera is ready
-                function enableCameraIfReady() {
-                    if (streaming) {
-                        captureBtn.disabled = false;
-                        console.log('Camera button enabled');
+            // Initialize IndexedDB
+            function initDB() {
+                const request = indexedDB.open('EcoTrackerDB', 2);
+
+                request.onerror = (event) => {
+                    console.error('Database error:', event.target.error);
+                    showError('Could not open database');
+                };
+
+                request.onupgradeneeded = (event) => {
+                    db = event.target.result;
+
+                    if (!db.objectStoreNames.contains('captures')) {
+                        const store = db.createObjectStore('captures', { keyPath: 'id', autoIncrement: true });
+                        store.createIndex('timestamp', 'timestamp', { unique: false });
+                        store.createIndex('location', 'location', { unique: false });
                     }
+                };
+
+                request.onsuccess = (event) => {
+                    db = event.target.result;
+                    console.log('Database initialized');
+                };
+            }
+
+            // Enable camera button if camera is ready
+            function enableCameraIfReady() {
+                if (streaming) {
+                    captureBtn.disabled = false;
+                    console.log('Camera button enabled');
+                }
+            }
+
+            // Start tracking location
+            function startLocationTracking() {
+                if (!navigator.geolocation) {
+                    locationStatus.textContent = 'Please enter your location manually';
+                    showManualLocationInput();
+                    locationResolved = false;
+                    return;
                 }
 
-                // Start tracking location
-                function startLocationTracking() {
-                    if (!navigator.geolocation) {
-                        locationStatus.textContent = 'Please enter your location manually';
+                locationStatus.textContent = 'Acquiring location...';
+
+                // Set a timeout for location acquisition
+                const locationTimeout = setTimeout(() => {
+                    if (!currentPosition) {
+                        locationStatus.textContent = 'Location timeout - please enter manually';
                         showManualLocationInput();
                         locationResolved = false;
-                        return;
                     }
+                }, 8000);
 
-                    locationStatus.textContent = 'Acquiring location...';
-                    
-                    // Set a timeout for location acquisition
-                    const locationTimeout = setTimeout(() => {
-                        if (!currentPosition) {
-                            locationStatus.textContent = 'Location timeout - please enter manually';
-                            showManualLocationInput();
-                            locationResolved = false;
-                        }
-                    }, 8000);
-                    
-                    // Get initial position
-                    navigator.geolocation.getCurrentPosition(
-                        (position) => {
-                            clearTimeout(locationTimeout);
-                            currentPosition = {
-                                latitude: position.coords.latitude,
-                                longitude: position.coords.longitude,
-                                accuracy: position.coords.accuracy,
-                                timestamp: position.timestamp
-                            };
-                            locationStatus.textContent = `GPS: ${currentPosition.latitude.toFixed(4)}, ${currentPosition.longitude.toFixed(4)}`;
-                            hideManualLocationInput();
-                            locationResolved = true;
-                            
-                            // Camera button is already enabled if camera is ready
-                        },
-                        (error) => {
-                            clearTimeout(locationTimeout);
-                            let errorMsg = '=-> ';
-                            switch(error.code) {
-                                case error.PERMISSION_DENIED:
-                                    errorMsg += 'Permission denied - enter manually';
-                                    break;
-                                case error.POSITION_UNAVAILABLE:
-                                    errorMsg += 'Position unavailable - enter manually';
-                                    break;
-                                case error.TIMEOUT:
-                                    errorMsg += 'Location timeout - enter manually';
-                                    break;
-                                default:
-                                    errorMsg += 'Location error - enter manually';
-                            }
-                            locationStatus.textContent = errorMsg;
-                            showManualLocationInput();
-                            locationResolved = false;
-                        },
-                        {
-                            enableHighAccuracy: true,
-                            timeout: 8000,
-                            maximumAge: 0
-                        }
-                    );
-                    
-                    // Watch for position updates (if successful)
-                    locationWatchId = navigator.geolocation.watchPosition(
-                        (position) => {
-                            currentPosition = {
-                                latitude: position.coords.latitude,
-                                longitude: position.coords.longitude,
-                                accuracy: position.coords.accuracy,
-                                timestamp: position.timestamp
-                            };
-                            locationStatus.textContent = `GPS: ${currentPosition.latitude.toFixed(4)}, ${currentPosition.longitude.toFixed(4)}`;
-                            hideManualLocationInput();
-                            locationResolved = true;
-                        },
-                        (error) => {
-                            // Just log watch errors, don't change UI
-                            console.log('Location watch error:', error);
-                        }
-                    );
-                }
-
-                // Show manual location input (now always visible but could be used to force state)
-                function showManualLocationInput() {
-                    useManualLocation = true;
-                    manualLocationBox.style.display = 'block';
-                }
-
-                // Hide manual location input (unused now but kept for consistency)
-                function hideManualLocationInput() {
-                    // We don't hide it anymore as requested, but we could if needed
-                }
-
-                // Validate manual location input
-                function validateManualLocation() {
-                    if (!parishSelect.value) {
-                        showError('Please select a parish');
-                        return false;
-                    }
-                    if (!communityInput.value.trim()) {
-                        showError('Please enter your community');
-                        return false;
-                    }
-                    return true;
-                }
-
-                // Handle manual location submission
-                submitManualLocation.addEventListener('click', (e) => {
-                    e.preventDefault();
-                    if (validateManualLocation()) {
-                        manualParish = parishSelect.value;
-                        manualCommunity = communityInput.value.trim();
-                        useManualLocation = true;
-                        
-                        // Update status
-                        locationStatus.textContent = `Using Manual: ${manualParish}, ${manualCommunity}`;
+                // Get initial position
+                navigator.geolocation.getCurrentPosition(
+                    (position) => {
+                        clearTimeout(locationTimeout);
+                        currentPosition = {
+                            latitude: position.coords.latitude,
+                            longitude: position.coords.longitude,
+                            accuracy: position.coords.accuracy,
+                            timestamp: position.timestamp
+                        };
+                        locationStatus.textContent = `GPS: ${currentPosition.latitude.toFixed(4)}, ${currentPosition.longitude.toFixed(4)}`;
+                        hideManualLocationInput();
                         locationResolved = true;
-                        
-                        submitManualLocation.textContent = '✓ Updated';
-                        setTimeout(() => {
-                            submitManualLocation.textContent = 'Update Location';
-                        }, 2000);
-                        
-                        showSuccess('Location updated manually.');
-                    }
-                });
 
-                // Save capture to IndexedDB
-                function saveToDB(imageBlob, metadata) {
-                    return new Promise((resolve, reject) => {
-                        if (!db) {
-                            reject('Database not initialized');
-                            return;
+                        // Camera button is already enabled if camera is ready
+                    },
+                    (error) => {
+                        clearTimeout(locationTimeout);
+                        let errorMsg = '=-> ';
+                        switch (error.code) {
+                            case error.PERMISSION_DENIED:
+                                errorMsg += 'Permission denied - enter manually';
+                                break;
+                            case error.POSITION_UNAVAILABLE:
+                                errorMsg += 'Position unavailable - enter manually';
+                                break;
+                            case error.TIMEOUT:
+                                errorMsg += 'Location timeout - enter manually';
+                                break;
+                            default:
+                                errorMsg += 'Location error - enter manually';
                         }
+                        locationStatus.textContent = errorMsg;
+                        showManualLocationInput();
+                        locationResolved = false;
+                    },
+                    {
+                        enableHighAccuracy: true,
+                        timeout: 8000,
+                        maximumAge: 0
+                    }
+                );
 
-                        const transaction = db.transaction(['captures'], 'readwrite');
-                        const store = transaction.objectStore('captures');
-                        
-                        const reader = new FileReader();
-                        reader.readAsDataURL(imageBlob);
-                        reader.onloadend = () => {
-                            const capture = {
-                                imageData: reader.result,
-                                timestamp: metadata.timestamp,
-                                dateTime: metadata.dateTime,
-                                location: metadata.location,
-                                dimensions: metadata.dimensions,
-                                deviceInfo: metadata.deviceInfo,
-                                locationType: metadata.locationType
-                            };
-                            
-                            const request = store.add(capture);
-                            
-                            request.onsuccess = () => {
-                                resolve(request.result);
-                            };
-                            
-                            request.onerror = (event) => {
-                                reject(event.target.error);
-                            };
+                // Watch for position updates (if successful)
+                locationWatchId = navigator.geolocation.watchPosition(
+                    (position) => {
+                        currentPosition = {
+                            latitude: position.coords.latitude,
+                            longitude: position.coords.longitude,
+                            accuracy: position.coords.accuracy,
+                            timestamp: position.timestamp
                         };
-                    });
-                }
+                        locationStatus.textContent = `GPS: ${currentPosition.latitude.toFixed(4)}, ${currentPosition.longitude.toFixed(4)}`;
+                        hideManualLocationInput();
+                        locationResolved = true;
+                    },
+                    (error) => {
+                        // Just log watch errors, don't change UI
+                        console.log('Location watch error:', error);
+                    }
+                );
+            }
 
-                function showError(text) {
-                    errorMsg.style.display = 'block';
-                    errorMsg.textContent = text;
-                    successMsg.style.display = 'none';
-                }
+            // Show manual location input (now always visible but could be used to force state)
+            function showManualLocationInput() {
+                useManualLocation = true;
+                manualLocationBox.style.display = 'block';
+            }
 
-                function showSuccess(text) {
-                    successMsg.style.display = 'block';
-                    successMsg.textContent = text;
-                    errorMsg.style.display = 'none';
-                    
+            // Hide manual location input (unused now but kept for consistency)
+            function hideManualLocationInput() {
+                // We don't hide it anymore as requested, but we could if needed
+            }
+
+            // Validate manual location input
+            function validateManualLocation() {
+                if (!parishSelect.value) {
+                    showError('Please select a parish');
+                    return false;
+                }
+                if (!communityInput.value.trim()) {
+                    showError('Please enter your community');
+                    return false;
+                }
+                return true;
+            }
+
+            // Handle manual location submission
+            submitManualLocation.addEventListener('click', (e) => {
+                e.preventDefault();
+                if (validateManualLocation()) {
+                    manualParish = parishSelect.value;
+                    manualCommunity = communityInput.value.trim();
+                    useManualLocation = true;
+
+                    // Update status
+                    locationStatus.textContent = `Using Manual: ${manualParish}, ${manualCommunity}`;
+                    locationResolved = true;
+
+                    submitManualLocation.textContent = '✓ Updated';
                     setTimeout(() => {
-                        successMsg.style.display = 'none';
-                    }, 3000);
+                        submitManualLocation.textContent = 'Update Location';
+                    }, 2000);
+
+                    showSuccess('Location updated manually.');
                 }
-                
-                function takePicture() {
-                    // Check if camera is ready
-                    if (!streaming) {
-                        showError('Camera not ready. Please wait.');
+            });
+
+            // Save capture to IndexedDB
+            function saveToDB(imageBlob, metadata) {
+                return new Promise((resolve, reject) => {
+                    if (!db) {
+                        reject('Database not initialized');
                         return;
                     }
 
-                    // Check location status and show appropriate message
-                    if (!locationResolved) {
-                        if (useManualLocation) {
-                            showError('Please enter your parish and community first');
-                            manualLocationBox.style.display = 'block';
-                        } else {
-                            showError('Waiting for location... You can enter manually below');
-                            manualLocationBox.style.display = 'block';
-                        }
-                        return;
-                    }
+                    const transaction = db.transaction(['captures'], 'readwrite');
+                    const store = transaction.objectStore('captures');
 
-                    // If using manual location but not saved yet
-                    if (useManualLocation && (!manualParish || !manualCommunity)) {
-                        showError('Please save your location first');
-                        manualLocationBox.style.display = 'block';
-                        return;
-                    }
-
-// Immediate visual feedback - screen flash and button animation
-                    screenFlash.classList.add('active');
-                    captureBtn.classList.add('flash');
-                    setTimeout(() => {
-                        screenFlash.classList.remove('active');
-                        captureBtn.classList.remove('flash');
-                    }, 300);
-
-                    const context = canvas.getContext('2d');
-                    
-                    canvas.width = video.videoWidth;
-                    canvas.height = video.videoHeight;
-                    
-                    context.save();
-                    context.translate(canvas.width, 0);
-                    context.scale(-1, 1);
-                    context.drawImage(video, 0, 0, canvas.width, canvas.height);
-                    context.restore();
-                    
-                    const now = new Date();
-                    const timestamp = now.getTime();
-                    const dateTime = now.toISOString();
-                    
-                    // Create location object based on availability - prioritize manual if provided
-                    let locationData;
-                    let locationType;
-                    
-                    if (manualParish && manualCommunity) {
-                        locationData = {
-                            type: 'manual',
-                            parish: manualParish,
-                            community: manualCommunity
+                    const reader = new FileReader();
+                    reader.readAsDataURL(imageBlob);
+                    reader.onloadend = () => {
+                        const capture = {
+                            imageData: reader.result,
+                            timestamp: metadata.timestamp,
+                            dateTime: metadata.dateTime,
+                            location: metadata.location,
+                            dimensions: metadata.dimensions,
+                            deviceInfo: metadata.deviceInfo,
+                            locationType: metadata.locationType
                         };
-                        locationType = 'manual';
-                    } else if (currentPosition) {
-                        locationData = {
-                            type: 'gps',
-                            latitude: currentPosition.latitude,
-                            longitude: currentPosition.longitude,
-                            accuracy: currentPosition.accuracy
+
+                        const request = store.add(capture);
+
+                        request.onsuccess = () => {
+                            resolve(request.result);
                         };
-                        locationType = 'gps';
-                    } else {
-                        // This case should be caught by locationResolved check, but as fallback:
-                        locationData = { type: 'unknown' };
-                        locationType = 'unknown';
-                    }
-                    
-                    const metadata = {
-                        timestamp: timestamp,
-                        dateTime: dateTime,
-                        location: locationData,
-                        locationType: locationType,
-                        dimensions: {
-                            width: canvas.width,
-                            height: canvas.height
-                        },
-                        deviceInfo: {
-                            userAgent: navigator.userAgent,
-                            platform: navigator.platform
-                        }
+
+                        request.onerror = (event) => {
+                            reject(event.target.error);
+                        };
                     };
-                    
-                    canvas.toBlob(async (blob) => {
-                        if (!blob) {
-                            showError('Could not generate image');
-                            return;
-                        }
-
-                        const description = descriptionInput.value.trim();
-                        if (!description) {
-                            showError('Please provide a description of the pollution');
-                            return;
-                        }
-
-                        try {
-                            // Show uploading status
-                            showSuccess('Sending report to EcoTrack server...');
-                            
-                            // Convert blob to base64 for the JSON payload
-                            const reader = new FileReader();
-                            reader.readAsDataURL(blob);
-                            reader.onloadend = async () => {
-                                const base64data = reader.result;
-
-                                const payload = {
-                                    imageUrl: base64data,
-                                    description: description,
-                                    latitude: locationData.type === 'gps' ? locationData.latitude : 0, // Backend expects numbers, manual location might need adjustment or backend update
-                                    longitude: locationData.type === 'gps' ? locationData.longitude : 0
-                                };
-
-                                // If manual, we might want to send the parish/community as part of description or update backend schema
-                                if (locationData.type === 'manual') {
-                                    payload.description = `[${locationData.parish}, ${locationData.community}] ${description}`;
-                                }
-
-                                try {
-                                    const response = await fetch('/report', {
-                                        method: 'POST',
-                                        headers: {
-                                            'Content-Type': 'application/json'
-                                        },
-                                        body: JSON.stringify(payload)
-                                    });
-
-                                    if (!response.ok) {
-                                        const errData = await response.json();
-                                        throw new Error(errData.error || 'Server error');
-                                    }
-
-                                    const result = await response.json();
-                                    
-                                    captureBtn.style.transform = 'scale(0.9)';
-                                    setTimeout(() => {
-                                        captureBtn.style.transform = '';
-                                    }, 100);
-                                    
-                                    showSuccess(`✅ Report sent successfully! (ID: ${result._id})`);
-                                    descriptionInput.value = ''; // Clear description
-                                    
-                                    // Refresh activity feed
-                                    fetchReports();
-                                    
-                                    // Optionally still save to local DB as backup
-                                    await saveToDB(blob, { ...metadata, serverId: result._id });
-                                } catch (fetchError) {
-                                    console.error('Fetch error:', fetchError);
-                                    showError('Failed to send report to server. Saved locally instead.');
-                                    await saveToDB(blob, metadata);
-                                }
-                            };
-                        } catch (err) {
-                            console.error('Error in takePicture:', err);
-                            showError('An error occurred. Saving locally.');
-                            await saveToDB(blob, metadata);
-                        }
-                        
-                    }, 'image/png');
-                }
-                
-async function initCamera() {
-                    try {
-                        // Try to get rear camera first, fall back to any camera
-                        let stream;
-                        try {
-                            // First attempt: try rear camera with ideal constraints
-                            stream = await navigator.mediaDevices.getUserMedia({ 
-                                video: {
-                                    width: { ideal: 1280 },
-                                    height: { ideal: 720 },
-                                    facingMode: { ideal: "environment" }
-                                }, 
-                                audio: false 
-                            });
-                        } catch (rearCameraError) {
-                            console.log('Rear camera failed, trying any camera:', rearCameraError);
-                            // Fallback: try any available camera
-                            stream = await navigator.mediaDevices.getUserMedia({ 
-                                video: true, 
-                                audio: false 
-                            });
-                        }
-                        
-                        video.srcObject = stream;
-                        
-                        video.addEventListener('canplay', () => {
-                            if (!streaming) {
-                                canvas.setAttribute('width', video.videoWidth);
-                                canvas.setAttribute('height', video.videoHeight);
-                                
-                                streaming = true;
-                                
-                                // Enable camera button as soon as camera is ready
-                                // regardless of location status
-                                captureBtn.disabled = false;
-                                console.log('Camera ready - button enabled');
-                                
-                                errorMsg.style.display = 'none';
-                            }
-                        });
-
-                    } catch (err) {
-                        console.error('Camera error:', err);
-                        let friendlyMsg = 'Could not access camera. ';
-                        if (err.name === 'NotAllowedError') friendlyMsg += 'Please grant permission.';
-                        else if (err.name === 'NotFoundError') friendlyMsg += 'No camera found.';
-                        else if (err.name === 'NotReadableError') friendlyMsg += 'Camera is busy.';
-                        else friendlyMsg += err.message;
-                        showError(friendlyMsg);
-                    }
-                }
-
-                captureBtn.addEventListener('click', (e) => {
-                    e.preventDefault();
-                    takePicture();
                 });
+            }
 
-                // Activity Feed Logic
-                async function fetchReports() {
-                    try {
-                        const response = await fetch('/reports');
-                        if (!response.ok) throw new Error('Could not fetch reports');
-                        const reports = await response.json();
-                        renderFeed(reports);
-                    } catch (err) {
-                        console.error('Feed error:', err);
-                        activityFeed.innerHTML = '<div class="loading-feed">Could not load activity feed. Is the server running?</div>';
-                    }
+            function showError(text) {
+                errorMsg.style.display = 'block';
+                errorMsg.textContent = text;
+                successMsg.style.display = 'none';
+            }
+
+            function showSuccess(text) {
+                successMsg.style.display = 'block';
+                successMsg.textContent = text;
+                errorMsg.style.display = 'none';
+
+                setTimeout(() => {
+                    successMsg.style.display = 'none';
+                }, 3000);
+            }
+
+            function takePicture() {
+                // Check if camera is ready
+                if (!streaming) {
+                    showError('Camera not ready. Please wait.');
+                    return;
                 }
-                function renderFeed(reports) {
-                    if (reports.length === 0) {
-                        activityFeed.innerHTML = '<div class="loading-feed">No reports yet. Be the first to help!</div>';
+
+                // Check location status and show appropriate message
+                if (!locationResolved) {
+                    if (useManualLocation) {
+                        showError('Please enter your parish and community first');
+                        manualLocationBox.style.display = 'block';
+                    } else {
+                        showError('Waiting for location... You can enter manually below');
+                        manualLocationBox.style.display = 'block';
+                    }
+                    return;
+                }
+
+                // If using manual location but not saved yet
+                if (useManualLocation && (!manualParish || !manualCommunity)) {
+                    showError('Please save your location first');
+                    manualLocationBox.style.display = 'block';
+                    return;
+                }
+
+                // Immediate visual feedback - screen flash and button animation
+                screenFlash.classList.add('active');
+                captureBtn.classList.add('flash');
+                setTimeout(() => {
+                    screenFlash.classList.remove('active');
+                    captureBtn.classList.remove('flash');
+                }, 300);
+
+                const context = canvas.getContext('2d');
+
+                canvas.width = video.videoWidth;
+                canvas.height = video.videoHeight;
+
+                context.save();
+                context.translate(canvas.width, 0);
+                context.scale(-1, 1);
+                context.drawImage(video, 0, 0, canvas.width, canvas.height);
+                context.restore();
+
+                const now = new Date();
+                const timestamp = now.getTime();
+                const dateTime = now.toISOString();
+
+                // Create location object based on availability - prioritize manual if provided
+                let locationData;
+                let locationType;
+
+                if (manualParish && manualCommunity) {
+                    locationData = {
+                        type: 'manual',
+                        parish: manualParish,
+                        community: manualCommunity
+                    };
+                    locationType = 'manual';
+                } else if (currentPosition) {
+                    locationData = {
+                        type: 'gps',
+                        latitude: currentPosition.latitude,
+                        longitude: currentPosition.longitude,
+                        accuracy: currentPosition.accuracy
+                    };
+                    locationType = 'gps';
+                } else {
+                    // This case should be caught by locationResolved check, but as fallback:
+                    locationData = { type: 'unknown' };
+                    locationType = 'unknown';
+                }
+
+                const metadata = {
+                    timestamp: timestamp,
+                    dateTime: dateTime,
+                    location: locationData,
+                    locationType: locationType,
+                    dimensions: {
+                        width: canvas.width,
+                        height: canvas.height
+                    },
+                    deviceInfo: {
+                        userAgent: navigator.userAgent,
+                        platform: navigator.platform
+                    }
+                };
+
+                canvas.toBlob(async (blob) => {
+                    if (!blob) {
+                        showError('Could not generate image');
                         return;
                     }
 
-                    activityFeed.innerHTML = '';
-                    reports.forEach(report => {
-                        const card = document.createElement('div');
-                        card.className = 'report-card';
-                        
-                        // Parse date for relative time or clean format
-                        const date = new Date(report.createdAt);
-                        const timeStr = date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-                        const dateStr = date.toLocaleDateString();
+                    const description = descriptionInput.value.trim();
+                    if (!description) {
+                        showError('Please provide a description of the pollution');
+                        return;
+                    }
 
-                        card.innerHTML = `
+                    try {
+                        // Show uploading status
+                        showSuccess('Sending report to EcoTrack server...');
+
+                        // Convert blob to base64 for the JSON payload
+                        const reader = new FileReader();
+                        reader.readAsDataURL(blob);
+                        reader.onloadend = async () => {
+                            const base64data = reader.result;
+
+                            const payload = {
+                                imageUrl: base64data,
+                                description: description,
+                                latitude: locationData.type === 'gps' ? locationData.latitude : 0, // Backend expects numbers, manual location might need adjustment or backend update
+                                longitude: locationData.type === 'gps' ? locationData.longitude : 0
+                            };
+
+                            // If manual, we might want to send the parish/community as part of description or update backend schema
+                            if (locationData.type === 'manual') {
+                                payload.description = `[${locationData.parish}, ${locationData.community}] ${description}`;
+                            }
+
+                            try {
+                                const response = await fetch('/report', {
+                                    method: 'POST',
+                                    headers: {
+                                        'Content-Type': 'application/json'
+                                    },
+                                    body: JSON.stringify(payload)
+                                });
+
+                                if (!response.ok) {
+                                    const errData = await response.json();
+                                    throw new Error(errData.error || 'Server error');
+                                }
+
+                                const result = await response.json();
+
+                                captureBtn.style.transform = 'scale(0.9)';
+                                setTimeout(() => {
+                                    captureBtn.style.transform = '';
+                                }, 100);
+
+                                showSuccess(`✅ Report sent successfully! (ID: ${result._id})`);
+                                descriptionInput.value = ''; // Clear description
+
+                                // Refresh activity feed
+                                fetchReports();
+
+                                // Optionally still save to local DB as backup
+                                await saveToDB(blob, { ...metadata, serverId: result._id });
+                            } catch (fetchError) {
+                                console.error('Fetch error:', fetchError);
+                                showError('Failed to send report to server. Saved locally instead.');
+                                await saveToDB(blob, metadata);
+                            }
+                        };
+                    } catch (err) {
+                        console.error('Error in takePicture:', err);
+                        showError('An error occurred. Saving locally.');
+                        await saveToDB(blob, metadata);
+                    }
+
+                }, 'image/png');
+            }
+
+            async function initCamera() {
+                try {
+                    // Try to get rear camera first, fall back to any camera
+                    let stream;
+                    try {
+                        // First attempt: try rear camera with ideal constraints
+                        stream = await navigator.mediaDevices.getUserMedia({
+                            video: {
+                                width: { ideal: 1280 },
+                                height: { ideal: 720 },
+                                facingMode: { ideal: "environment" }
+                            },
+                            audio: false
+                        });
+                    } catch (rearCameraError) {
+                        console.log('Rear camera failed, trying any camera:', rearCameraError);
+                        // Fallback: try any available camera
+                        stream = await navigator.mediaDevices.getUserMedia({
+                            video: true,
+                            audio: false
+                        });
+                    }
+
+                    video.srcObject = stream;
+
+                    video.addEventListener('canplay', () => {
+                        if (!streaming) {
+                            canvas.setAttribute('width', video.videoWidth);
+                            canvas.setAttribute('height', video.videoHeight);
+
+                            streaming = true;
+
+                            // Enable camera button as soon as camera is ready
+                            // regardless of location status
+                            captureBtn.disabled = false;
+                            console.log('Camera ready - button enabled');
+
+                            errorMsg.style.display = 'none';
+                        }
+                    });
+
+                } catch (err) {
+                    console.error('Camera error:', err);
+                    let friendlyMsg = 'Could not access camera. ';
+                    if (err.name === 'NotAllowedError') friendlyMsg += 'Please grant permission.';
+                    else if (err.name === 'NotFoundError') friendlyMsg += 'No camera found.';
+                    else if (err.name === 'NotReadableError') friendlyMsg += 'Camera is busy.';
+                    else friendlyMsg += err.message;
+                    showError(friendlyMsg);
+                }
+            }
+
+            captureBtn.addEventListener('click', (e) => {
+                e.preventDefault();
+                takePicture();
+            });
+
+            // Activity Feed Logic
+            async function fetchReports() {
+                try {
+                    const response = await fetch('/reports');
+                    if (!response.ok) throw new Error('Could not fetch reports');
+                    const reports = await response.json();
+                    renderFeed(reports);
+                } catch (err) {
+                    console.error('Feed error:', err);
+                    activityFeed.innerHTML = '<div class="loading-feed">Could not load activity feed. Is the server running?</div>';
+                }
+            }
+            function renderFeed(reports) {
+                if (reports.length === 0) {
+                    activityFeed.innerHTML = '<div class="loading-feed">No reports yet. Be the first to help!</div>';
+                    return;
+                }
+
+                activityFeed.innerHTML = '';
+                reports.forEach(report => {
+                    const card = document.createElement('div');
+                    card.className = 'report-card';
+
+                    // Parse date for relative time or clean format
+                    const date = new Date(report.createdAt);
+                    const timeStr = date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                    const dateStr = date.toLocaleDateString();
+
+                    card.innerHTML = `
                             <div class="report-image-container">
                                 <img src="${report.imageUrl}" alt="Pollution report">
                             </div>
@@ -998,44 +1058,45 @@ async function initCamera() {
                                 </a>
                             </div>
                         `;
-                        activityFeed.appendChild(card);
-                    });
-                }
-
-                // Initialize everything
-                initDB();
-                startLocationTracking();
-                initCamera();
-                fetchReports(); // Initial feed load
-
-                // Clean up
-                window.addEventListener('beforeunload', () => {
-                    const stream = video.srcObject;
-                    if (stream) {
-                        stream.getTracks().forEach(track => track.stop());
-                    }
-                    if (locationWatchId) {
-                        navigator.geolocation.clearWatch(locationWatchId);
-                    }
-                    if (db) {
-                        db.close();
-                    }
+                    activityFeed.appendChild(card);
                 });
+            }
 
-                // Debug function
-                window.viewCaptures = function() {
-                    if (!db) return;
-                    
-                    const transaction = db.transaction(['captures'], 'readonly');
-                    const store = transaction.objectStore('captures');
-                    const request = store.getAll();
-                    
-                    request.onsuccess = () => {
-                        console.log('All captures:', request.result);
-                    };
+            // Initialize everything
+            initDB();
+            startLocationTracking();
+            initCamera();
+            fetchReports(); // Initial feed load
+
+            // Clean up
+            window.addEventListener('beforeunload', () => {
+                const stream = video.srcObject;
+                if (stream) {
+                    stream.getTracks().forEach(track => track.stop());
+                }
+                if (locationWatchId) {
+                    navigator.geolocation.clearWatch(locationWatchId);
+                }
+                if (db) {
+                    db.close();
+                }
+            });
+
+            // Debug function
+            window.viewCaptures = function () {
+                if (!db) return;
+
+                const transaction = db.transaction(['captures'], 'readonly');
+                const store = transaction.objectStore('captures');
+                const request = store.getAll();
+
+                request.onsuccess = () => {
+                    console.log('All captures:', request.result);
                 };
+            };
 
-            })();
-        </script>
-    </body>
+        })();
+    </script>
+</body>
+
 </html>
