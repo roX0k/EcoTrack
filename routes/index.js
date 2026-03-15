@@ -58,9 +58,25 @@ const sendEmailNotification = async (report) => {
     await transporter.sendMail(mailOptions);
     console.log('Notification email sent successfully');
   } catch (error) {
-    console.error('Error sending notification email:', error);
+    console.error('Error sending notification email:', error.message);
   }
 };
+
+// Health Check
+router.get('/health', async (req, res) => {
+  try {
+    await connectDB();
+    const state = mongoose.connection.readyState;
+    const states = { 0: 'disconnected', 1: 'connected', 2: 'connecting', 3: 'disconnecting' };
+    res.json({ 
+      status: 'ok', 
+      database: states[state] || 'unknown',
+      timestamp: new Date().toISOString()
+    });
+  } catch (error) {
+    res.status(500).json({ status: 'error', message: error.message });
+  }
+});
 
 // POST /report - Create a new pollution report
 router.post('/report', async (req, res) => {
@@ -69,14 +85,16 @@ router.post('/report', async (req, res) => {
     const validatedData = reportSchema.parse(req.body);
     const newReport = new Report(validatedData);
     const savedReport = await newReport.save();
+    console.log(`Report saved: ${savedReport._id}`);
     sendEmailNotification(savedReport); // fire and forget
     res.status(201).json(savedReport);
   } catch (error) {
     if (error instanceof z.ZodError) {
+      console.warn('Validation error:', error.errors);
       return res.status(400).json({ errors: error.errors });
     }
-    console.error('Error saving report:', error);
-    res.status(500).json({ error: 'Internal Server Error' });
+    console.error('Error saving report:', error.message);
+    res.status(500).json({ error: 'Internal Server Error', details: error.message });
   }
 });
 

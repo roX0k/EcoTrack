@@ -1017,12 +1017,28 @@
             async function fetchReports() {
                 try {
                     const response = await fetch('/reports');
-                    if (!response.ok) throw new Error('Could not fetch reports');
+                    if (!response.ok) {
+                        const err = await response.json().catch(() => ({}));
+                        throw new Error(err.error || 'Could not fetch reports');
+                    }
                     const reports = await response.json();
                     renderFeed(reports);
                 } catch (err) {
                     console.error('Feed error:', err);
-                    activityFeed.innerHTML = '<div class="loading-feed">Could not load activity feed. Is the server running?</div>';
+                    activityFeed.innerHTML = `<div class="loading-feed">Could not load activity feed: ${err.message}. Is the server running?</div>`;
+                }
+            }
+
+            async function checkHealth() {
+                try {
+                    const response = await fetch('/health');
+                    const health = await response.json();
+                    console.log('Health check:', health);
+                    if (health.database !== 'connected') {
+                        showError(`Warning: Database is ${health.database}. Reports may not save.`);
+                    }
+                } catch (err) {
+                    console.warn('Health check failed:', err.message);
                 }
             }
             function renderFeed(reports) {
@@ -1066,6 +1082,7 @@
             initDB();
             startLocationTracking();
             initCamera();
+            checkHealth();
             fetchReports(); // Initial feed load
 
             // Clean up
